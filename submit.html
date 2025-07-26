@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Submit Your Accusation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>Submit Your Accusation</h1>
+    <p>You’ve explored all the IoT device data. It’s time to submit your final accusation. Enter the name of the suspect, your reasoning, and any final flag or code you've uncovered.</p>
+    
+    <form id="accusationForm" action="#" method="post">
+      <label for="name">Suspect Name:</label><br>
+      <input type="text" id="name" name="name" required><br><br>
+
+      <label for="reason">Reason / Evidence (200 characters max):</label><br>
+      <textarea id="reason" name="reason" rows="4" cols="50" maxlength="200" required></textarea><br><br>
+
+      <label for="flag">Final Flag (if discovered):</label><br>
+      <input type="text" id="flag" name="flag"><br><br>
+
+      <input type="submit" value="Submit Accusation">
+    </form>
+    <div id="resultMessage" style="margin-top:20px;"></div>
+
+    <hr>
+
+    <h3>Helpful Tips</h3>
+    <ul>
+      <li>Double-check timestamps in smart-lock, mirror, and kitchen logs.</li>
+      <li>Who had access before the system was active?</li>
+      <li>Look for unusual behavior in heat, light, or access logs.</li>
+    </ul>
+
+    <p><strong>clue{submission-ready}</strong></p>
+    <p><em>Use this final page wisely. Only accurate submissions will be accepted by the system.</em></p>
+  </div>
+
+</body>
+<script>
+  document.getElementById('accusationForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const name = document.getElementById('name').value.trim();
+    const flag = document.getElementById('flag').value.trim();
+    const resultDiv = document.getElementById('resultMessage');
+    // Set your correct flag here
+    const correctFlag = 'clue{submission-ready}';
+    if (!name) {
+      resultDiv.innerHTML = '<span style="color:red;">Please enter a suspect name.</span>';
+      return;
+    }
+    if (flag === correctFlag) {
+      window.location.href = 'congratulations.html';
+    } else {
+      resultDiv.innerHTML = '<span style="color:red;">Incorrect flag. Please try again.</span>';
+    }
+  });
+</script>
+</html>
