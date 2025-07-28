@@ -38,24 +38,10 @@
     <p><em>Use this final page wisely. Only accurate submissions will be accepted by the system.</em></p>
   </div>
 
+  <!-- System Scripts -->
+  <script src="config.js"></script>
+  <script src="decoy.js"></script>
+  <!-- Validation Script -->
+  <script src="validation.min.js"></script>
 </body>
-<script>
-  document.getElementById('accusationForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const name = document.getElementById('name').value.trim();
-    const flag = document.getElementById('flag').value.trim();
-    const resultDiv = document.getElementById('resultMessage');
-    // Set your correct flag here
-    const correctFlag = 'clue{submission-ready}';
-    if (!name) {
-      resultDiv.innerHTML = '<span style="color:red;">Please enter a suspect name.</span>';
-      return;
-    }
-    if (flag === correctFlag) {
-      window.location.href = 'congratulations.html';
-    } else {
-      resultDiv.innerHTML = '<span style="color:red;">Incorrect flag. Please try again.</span>';
-    }
-  });
-</script>
 </html>
