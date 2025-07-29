@@ -2,56 +2,117 @@
 (function() {
   'use strict';
   
-  // Obfuscated validation logic
-  const _0x4a5b = ['accusationForm', 'submit', 'addEventListener', 'preventDefault', 'name', 'flag', 'value', 'trim', 'resultMessage', 'innerHTML', 'location', 'href', 'congratulations.html'];
+  // Track attempts using localStorage
+  let attempts = parseInt(localStorage.getItem('ctf_attempts') || '0');
+  const maxAttempts = 3;
   
   function validateSubmission() {
-    const form = document.getElementById(_0x4a5b[0]);
+    const form = document.getElementById('accusationForm');
     if (!form) return;
     
-    form[_0x4a5b[2]](_0x4a5b[1], function(e) {
-      e[_0x4a5b[3]]();
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
       
-      const nameInput = document.getElementById(_0x4a5b[4]);
-      const flagInput = document.getElementById(_0x4a5b[5]);
-      const resultDiv = document.getElementById(_0x4a5b[8]);
+      const nameInput = document.getElementById('name');
+      const flagInput = document.getElementById('flag');
+      const resultDiv = document.getElementById('resultMessage');
       
       if (!nameInput || !flagInput || !resultDiv) return;
       
-      const name = nameInput[_0x4a5b[6]][_0x4a5b[7]]();
-      const flag = flagInput[_0x4a5b[6]][_0x4a5b[7]]();
-      
-      // Hidden validation logic
-      const key1 = 'clue{';
-      const key2 = 'submission';
-      const key3 = '-ready}';
-      const correctFlag = key1 + key2 + key3;
-      
-      if (!name) {
-        resultDiv[_0x4a5b[9]] = '<span style="color:red;">Please enter a suspect name.</span>';
+      // Check if already exceeded attempts
+      if (attempts >= maxAttempts) {
+        resultDiv.innerHTML = '<span style="color:red; font-weight:bold;">Out of chances! Thank you for coming to Robotics and IoT Club.</span>';
+        nameInput.disabled = true;
+        flagInput.disabled = true;
+        document.querySelector('input[type="submit"]').disabled = true;
         return;
       }
       
-      // Additional validation layers
-      if (flag === correctFlag && name.length > 0) {
-        // Multiple redirect attempts to confuse
+      const name = nameInput.value.trim();
+      const flag = flagInput.value.trim();
+      
+      if (!name) {
+        resultDiv.innerHTML = '<span style="color:red;">Please enter a suspect name.</span>';
+        return;
+      }
+      
+      if (!flag) {
+        resultDiv.innerHTML = '<span style="color:red;">Please enter a flag.</span>';
+        return;
+      }
+      
+      // Correct answers
+      const correctName = 'rian kapoor';
+      const correctFlag = 'club{Visit-again-if-you-want-intesting-events}';
+      
+      // Check if both name and flag are correct (case insensitive for name)
+      const isNameCorrect = name.toLowerCase() === correctName;
+      const isFlagCorrect = flag === correctFlag;
+      
+      if (isNameCorrect && isFlagCorrect) {
+        // Success - redirect to congratulations page
+        resultDiv.innerHTML = '<span style="color:green; font-weight:bold;">Correct! Redirecting...</span>';
         setTimeout(() => {
-          window[_0x4a5b[10]][_0x4a5b[11]] = _0x4a5b[12];
-        }, 500);
-      } else {
-        resultDiv[_0x4a5b[9]] = '<span style="color:red;">Incorrect flag or suspect. Please try again.</span>';
-        // Add fake delay to simulate server validation
-        setTimeout(() => {
-          console.log('Validation complete');
+          localStorage.removeItem('ctf_attempts'); // Reset attempts on success
+          window.location.href = 'congratulations.html';
         }, 1000);
+      } else {
+        // Increment attempts
+        attempts++;
+        localStorage.setItem('ctf_attempts', attempts.toString());
+        
+        const attemptsLeft = maxAttempts - attempts;
+        
+        if (attemptsLeft > 0) {
+          let errorMessage = '';
+          if (!isNameCorrect && !isFlagCorrect) {
+            errorMessage = 'Both name and flag are incorrect.';
+          } else if (!isNameCorrect) {
+            errorMessage = 'Name is incorrect.';
+          } else if (!isFlagCorrect) {
+            errorMessage = 'Flag is incorrect.';
+          }
+          
+          resultDiv.innerHTML = `<span style="color:red; font-weight:bold;">${errorMessage} ${attemptsLeft} attempt(s) left.</span>`;
+        } else {
+          resultDiv.innerHTML = '<span style="color:red; font-weight:bold;">Out of chances! Thank you for coming to Robotics and IoT Club.</span>';
+          nameInput.disabled = true;
+          flagInput.disabled = true;
+          document.querySelector('input[type="submit"]').disabled = true;
+        }
       }
     });
   }
   
+  // Display current attempts status
+  function displayAttemptsStatus() {
+    const resultDiv = document.getElementById('resultMessage');
+    if (resultDiv && attempts > 0 && attempts < maxAttempts) {
+      const attemptsLeft = maxAttempts - attempts;
+      resultDiv.innerHTML = `<span style="color:orange;">You have ${attemptsLeft} attempt(s) remaining.</span>`;
+    } else if (attempts >= maxAttempts) {
+      const nameInput = document.getElementById('name');
+      const flagInput = document.getElementById('flag');
+      const submitButton = document.querySelector('input[type="submit"]');
+      
+      if (nameInput) nameInput.disabled = true;
+      if (flagInput) flagInput.disabled = true;
+      if (submitButton) submitButton.disabled = true;
+      
+      if (resultDiv) {
+        resultDiv.innerHTML = '<span style="color:red; font-weight:bold;">Out of chances! Thank you for coming to Robotics and IoT Club.</span>';
+      }
+    }
+  }
+  
   // Initialize when DOM is ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', validateSubmission);
+    document.addEventListener('DOMContentLoaded', function() {
+      validateSubmission();
+      displayAttemptsStatus();
+    });
   } else {
     validateSubmission();
+    displayAttemptsStatus();
   }
 })();
